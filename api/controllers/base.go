@@ -3,11 +3,13 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"github.com/abhay676/auth/api/middlewares"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -30,6 +32,9 @@ func (s *Server) Initialize(uri, database string) {
 }
 
 func (s *Server) Run(addr string) {
-	fmt.Printf("Listening on Port %v", addr)
+	logger := log.New(os.Stdout, "", log.LstdFlags)
+	fmt.Printf("Listening on Port %v\n", addr)
+	logMiddleware := middlewares.NewLogMiddleware(logger)
+	s.Router.Use(logMiddleware.Func())
 	log.Fatal(http.ListenAndServe(addr, s.Router))
 }
